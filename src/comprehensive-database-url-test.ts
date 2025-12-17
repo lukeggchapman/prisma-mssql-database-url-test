@@ -39,8 +39,8 @@ const testScenarios: TestScenario[] = [
     port: 1434
   },
   {
-    name: 'URL Problematic Characters',
-    rawPassword: 'Pass@#%&2024',
+    name: 'URL Problematic Characters with Parentheses',
+    rawPassword: 'Pass@#%&(Test)2024',
     port: 1435
   },
   {

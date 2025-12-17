@@ -47,13 +47,13 @@ services:
       retries: 10
       start_period: 30s
 
-  # Password with URL problematic characters
+  # Password with URL problematic characters including parentheses
   mssql-url-chars:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: mssql-url-chars-test
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=Pass@#%&2024
+      - SA_PASSWORD=Pass@#%&(Test)2024
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
@@ -64,7 +64,7 @@ services:
     mem_limit: 4g
     cpus: 2
     healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Pass@#%&2024" -Q "SELECT 1" || exit 1
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Pass@#%&(Test)2024" -Q "SELECT 1" || exit 1
       interval: 10s
       timeout: 3s
       retries: 10

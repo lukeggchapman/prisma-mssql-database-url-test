@@ -35,6 +35,16 @@ const testScenarios: TestScenario[] = [
     port: 1434,
   },
   {
+    name: "URL Problematic Characters with Parentheses",
+    rawPassword: "Pass@#%&(Test)2024",
+    port: 1435,
+  },
+  {
+    name: "SQL Escape Characters",
+    rawPassword: "Pass'Word\"2024",
+    port: 1436,
+  },
+  {
     name: "Complex Special Characters",
     rawPassword: "P{a}s@s#w%o&r*d!2024",
     port: 1437,
