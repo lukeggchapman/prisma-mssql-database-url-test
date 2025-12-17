@@ -1,5 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import * as dotenv from "dotenv";
+import { 
+  createMssqlAdapterFromUrl, 
+  createMssqlAdapterFromConfig, 
+  createMssqlConfig,
+  createDatabaseUrl,
+  urlEncodePassword 
+} from './adapter-utils.js';
 
 dotenv.config();
 
@@ -20,24 +27,6 @@ interface TestScenario {
   };
 }
 
-export function urlEncodePassword(password: string): string {
-  return encodeURIComponent(password)
-    .replace(/'/g, "%27")
-    .replace(/"/g, "%22")
-    .replace(/{/g, "%7B")
-    .replace(/}/g, "%7D");
-}
-
-export function createDatabaseUrl(
-  host: string,
-  port: number,
-  username: string,
-  password: string,
-  database: string = "master"
-): string {
-  const encodedPassword = urlEncodePassword(password);
-  return `sqlserver://${username}:${encodedPassword}@${host}:${port};database=${database};encrypt=true;trustServerCertificate=true`;
-}
 
 export const testScenarios: TestScenario[] = [
   {
@@ -96,13 +85,14 @@ export async function testDatabaseConnection(scenario: TestScenario): Promise<{
   console.log(`   Password: ${scenario.password}`);
   console.log(`   Port: ${scenario.port}`);
 
-  // Test with DATABASE_URL approach
-  console.log(`\n📝 Database URL: ${scenario.databaseUrl}`);
+  // Test 1: DATABASE_URL approach with adapter
+  console.log(`\n📝 Testing DATABASE_URL approach`);
+  console.log(`   Database URL: ${scenario.databaseUrl}`);
 
   try {
-    process.env.DATABASE_URL = scenario.databaseUrl;
-
+    const adapter = await createMssqlAdapterFromUrl(scenario.databaseUrl);
     const prisma = new PrismaClient({
+      adapter,
       log: ["error"],
     });
 
@@ -126,23 +116,72 @@ export async function testDatabaseConnection(scenario: TestScenario): Promise<{
 
     await prisma.$disconnect();
 
-    console.log(`   ✅ DATABASE_URL connection successful`);
+    console.log(`   ✅ DATABASE_URL approach successful`);
     return { success: true, method: "database_url" };
   } catch (error) {
     console.log(
-      `   ❌ DATABASE_URL connection failed: ${
+      `   ❌ DATABASE_URL approach failed: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
     );
 
-    // TODO: Test with individual config approach
-    // This would require a different Prisma setup or direct database connection
+    // Test 2: Individual config approach
+    console.log(`\n🔧 Testing individual config approach`);
+    
+    try {
+      const config = createMssqlConfig(
+        'localhost',
+        scenario.port,
+        'sa',
+        scenario.password
+      );
+      
+      console.log(`   Config: ${JSON.stringify({
+        ...config,
+        password: '[REDACTED]'
+      }, null, 2)}`);
+      
+      const adapter = await createMssqlAdapterFromConfig(config);
+      const prisma = new PrismaClient({
+        adapter,
+        log: ["error"],
+      });
 
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-      method: "database_url",
-    };
+      // Test connection
+      await prisma.$connect();
+
+      // Test query
+      await prisma.$queryRaw`SELECT 1 as test`;
+
+      // Test table creation (if it doesn't exist)
+      try {
+        await prisma.connectionTest.findFirst();
+      } catch (error) {
+        // Table might not exist yet, that's ok for connection testing
+        console.log(
+          `   ℹ️  Tables not found (expected for fresh DB): ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+      }
+
+      await prisma.$disconnect();
+
+      console.log(`   ✅ Individual config approach successful`);
+      return { success: true, method: "individual_config" };
+    } catch (configError) {
+      console.log(
+        `   ❌ Individual config approach also failed: ${
+          configError instanceof Error ? configError.message : "Unknown error"
+        }`
+      );
+      
+      return {
+        success: false,
+        error: `DATABASE_URL: ${error instanceof Error ? error.message : "Unknown error"}; Config: ${configError instanceof Error ? configError.message : "Unknown error"}`,
+        method: "database_url",
+      };
+    }
   }
 }
 

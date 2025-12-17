@@ -1,13 +1,20 @@
-# Database Connection Tester
+# Database Connection Tester for Prisma 7
 
-A comprehensive testing environment for resolving Prisma 7 MSSQL adapter configuration issues with `DATABASE_URL` and special character passwords.
+A comprehensive testing environment for resolving Prisma 7 MSSQL adapter configuration issues with special character passwords, including curly braces `{` and `}`.
 
 ## Problem Statement
 
-When using Prisma 7 with the MSSQL adapter, there are challenges with:
-- Using `DATABASE_URL` for both CLI operations (migrations, introspections) and client connections
-- Handling passwords with special characters (especially `{` and `}`)
-- Choosing between `DATABASE_URL` vs individual configuration parameters
+Prisma 7 introduces a new adapter pattern that requires:
+```typescript
+const adapter = new PrismaMssql(config);
+const prisma = new PrismaClient({ adapter });
+```
+
+This creates challenges:
+- **CLI Operations**: `prisma migrate`, `prisma generate`, `prisma db pull` require `DATABASE_URL` configuration in `prisma.config.ts`
+- **Client Connections**: Can use either `DATABASE_URL` (with URL encoding) or individual config objects
+- **Special Characters**: Passwords with `{`, `}`, `@`, `#`, `%`, `&`, `'`, `"` need proper handling
+- **Configuration Standardisation**: Choosing the most reliable approach for your team
 
 ## Test Scenarios
 
@@ -25,11 +32,41 @@ This project tests various password patterns:
 # 1. Install dependencies
 pnpm install
 
-# 2. Copy environment file
+# 2. Copy environment file (optional - tests have built-in scenarios)
 cp .env.example .env
 
 # 3. Start databases and run all tests
 pnpm test
+
+# 4. View usage examples
+ts-node src/usage-examples.ts
+```
+
+## Prisma 7 Adapter Approaches
+
+This tester validates both connection methods:
+
+### 1. DATABASE_URL Approach (for CLI operations)
+```typescript
+// Used by prisma.config.ts for migrations, introspections
+const databaseUrl = "sqlserver://sa:Strong%7BPass%7D2024!@localhost:1434;database=master;encrypt=true;trustServerCertificate=true";
+const adapter = await createMssqlAdapterFromUrl(databaseUrl);
+const prisma = new PrismaClient({ adapter });
+```
+
+### 2. Individual Config Approach (for applications)
+```typescript
+// Direct config object - no URL encoding needed
+const config = {
+  server: 'localhost',
+  port: 1434,
+  user: 'sa',
+  password: 'Strong{Pass}2024!', // Raw password
+  database: 'master',
+  options: { encrypt: true, trustServerCertificate: true }
+};
+const adapter = new PrismaMssql(config);
+const prisma = new PrismaClient({ adapter });
 ```
 
 ## Manual Setup
@@ -42,8 +79,12 @@ docker-compose up -d
 docker-compose ps
 
 # Run specific tests
-pnpm test:connection    # Test database connections only  
-pnpm test:migration     # Test Prisma migrations only
+pnpm test:connection    # Test both URL and config approaches
+pnpm test:migration     # Test CLI operations with scenarios
+pnpm dev                # Interactive mode with instructions
+
+# Run examples  
+ts-node src/usage-examples.ts
 
 # Individual container testing
 docker-compose logs mssql-curly  # Check specific container

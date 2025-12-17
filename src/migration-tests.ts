@@ -1,7 +1,8 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as dotenv from 'dotenv';
-import { testScenarios, createDatabaseUrl } from './connection-tests';
+import { testScenarios } from './connection-tests.js';
+import { createDatabaseUrl } from './adapter-utils.js';
 
 dotenv.config();
 
@@ -17,16 +18,17 @@ interface MigrationResult {
 
 export async function runPrismaCommand(
   command: string,
-  databaseUrl: string,
+  testScenario: string,
   timeoutMs: number = 30000
 ): Promise<{ success: boolean; output: string; error?: string }> {
   try {
     const env = {
       ...process.env,
-      DATABASE_URL: databaseUrl,
+      PRISMA_TEST_SCENARIO: testScenario,
     };
 
     console.log(`   🔄 Running: ${command}`);
+    console.log(`   📋 Test Scenario: ${testScenario}`);
     
     const { stdout, stderr } = await execAsync(command, {
       timeout: timeoutMs,
@@ -56,14 +58,33 @@ export async function runPrismaCommand(
   }
 }
 
+// Map scenario names to environment variable values
+const scenarioMap: Record<string, string> = {
+  'Basic Password': 'basic',
+  'Curly Braces Password': 'curly',
+  'URL Problematic Characters': 'urlChars',
+  'SQL Escape Characters': 'sqlChars',
+  'Complex Special Characters': 'complex',
+};
+
 export async function testPrismaMigration(scenario: typeof testScenarios[0]): Promise<MigrationResult> {
   console.log(`\n🔧 Testing Prisma Migration: ${scenario.name}`);
   console.log(`   Database URL: ${scenario.databaseUrl}`);
+  
+  const envScenario = scenarioMap[scenario.name];
+  if (!envScenario) {
+    return {
+      scenario: scenario.name,
+      success: false,
+      error: `Unknown scenario mapping for: ${scenario.name}`,
+      command: 'mapping',
+    };
+  }
 
   // Test: prisma db push (simpler than full migration for testing)
   const pushResult = await runPrismaCommand(
     'npx prisma db push --force-reset --accept-data-loss',
-    scenario.databaseUrl
+    envScenario
   );
 
   if (!pushResult.success) {
@@ -82,7 +103,7 @@ export async function testPrismaMigration(scenario: typeof testScenarios[0]): Pr
   // Test: prisma generate
   const generateResult = await runPrismaCommand(
     'npx prisma generate',
-    scenario.databaseUrl
+    envScenario
   );
 
   if (!generateResult.success) {
@@ -108,10 +129,20 @@ export async function testPrismaMigration(scenario: typeof testScenarios[0]): Pr
 
 export async function testPrismaIntrospect(scenario: typeof testScenarios[0]): Promise<MigrationResult> {
   console.log(`\n🔍 Testing Prisma Introspection: ${scenario.name}`);
+  
+  const envScenario = scenarioMap[scenario.name];
+  if (!envScenario) {
+    return {
+      scenario: scenario.name,
+      success: false,
+      error: `Unknown scenario mapping for: ${scenario.name}`,
+      command: 'mapping',
+    };
+  }
 
   const introspectResult = await runPrismaCommand(
     'npx prisma db pull',
-    scenario.databaseUrl
+    envScenario
   );
 
   if (!introspectResult.success) {
