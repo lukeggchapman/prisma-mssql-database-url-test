@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Standard password for baseline testing
@@ -11,10 +11,10 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
-      - '1433:1433'
+      - "1433:1433"
     volumes:
       - mssql-basic-data:/var/opt/mssql
-    shm_size: '2gb'
+    shm_size: "2gb"
     mem_limit: 4g
     cpus: 2
     healthcheck:
@@ -34,10 +34,10 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
-      - '1434:1433'
+      - "1434:1433"
     volumes:
       - mssql-curly-data:/var/opt/mssql
-    shm_size: '2gb'
+    shm_size: "2gb"
     mem_limit: 4g
     cpus: 2
     healthcheck:
@@ -57,10 +57,10 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
-      - '1435:1433'
+      - "1435:1433"
     volumes:
       - mssql-url-chars-data:/var/opt/mssql
-    shm_size: '2gb'
+    shm_size: "2gb"
     mem_limit: 4g
     cpus: 2
     healthcheck:
@@ -80,10 +80,10 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
-      - '1436:1433'
+      - "1436:1433"
     volumes:
       - mssql-sql-chars-data:/var/opt/mssql
-    shm_size: '2gb'
+    shm_size: "2gb"
     mem_limit: 4g
     cpus: 2
     healthcheck:
@@ -103,10 +103,10 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
     ports:
-      - '1437:1433'
+      - "1437:1433"
     volumes:
       - mssql-complex-data:/var/opt/mssql
-    shm_size: '2gb'
+    shm_size: "2gb"
     mem_limit: 4g
     cpus: 2
     healthcheck:

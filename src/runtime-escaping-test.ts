@@ -130,12 +130,7 @@ async function testApproach1(scenario: TestScenario): Promise<{
     "sa",
     scenario.rawPassword
   );
-  console.log(
-    `   Raw URL: ${rawDatabaseUrl.replace(
-      scenario.rawPassword,
-      "[RAW_PASSWORD]"
-    )}`
-  );
+  console.log(`   Raw URL: ${rawDatabaseUrl}`);
 
   // Step 2: Test adapter with raw URL directly (no parsing)
   console.log(`\n   🔌 Testing adapter with raw URL string directly...`);
@@ -165,12 +160,7 @@ async function testApproach1(scenario: TestScenario): Promise<{
   let cliSuccess = false;
   try {
     const escapedUrlForCli = escapePasswordInUrl(rawDatabaseUrl);
-    console.log(
-      `      Escaped for CLI: ${escapedUrlForCli.replace(
-        escapeSqlServerPassword(scenario.rawPassword),
-        "[ESCAPED_PASSWORD]"
-      )}`
-    );
+    console.log(`      Escaped for CLI: ${escapedUrlForCli}`);
 
     const env = {
       ...process.env,
@@ -228,12 +218,7 @@ async function testApproach2(scenario: TestScenario): Promise<{
     "sa",
     scenario.rawPassword
   );
-  console.log(
-    `   Escaped URL: ${escapedDatabaseUrl.replace(
-      escapeSqlServerPassword(scenario.rawPassword),
-      "[ESCAPED_PASSWORD]"
-    )}`
-  );
+  console.log(`   Escaped URL: ${escapedDatabaseUrl}`);
 
   // Step 2: Test CLI with escaped URL (should work)
   console.log(`\n   🔧 Testing CLI with escaped URL...`);
@@ -268,12 +253,7 @@ async function testApproach2(scenario: TestScenario): Promise<{
   let adapterSuccess = false;
   try {
     const unescapedUrlForAdapter = unescapePasswordInUrl(escapedDatabaseUrl);
-    console.log(
-      `      Unescaped for adapter: ${unescapedUrlForAdapter.replace(
-        scenario.rawPassword,
-        "[RAW_PASSWORD]"
-      )}`
-    );
+    console.log(`      Unescaped for adapter: ${unescapedUrlForAdapter}`);
 
     // Pass the unescaped URL string directly to PrismaMssql
     const adapter = new PrismaMssql(unescapedUrlForAdapter);
