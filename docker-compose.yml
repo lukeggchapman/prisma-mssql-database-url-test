@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # Standard password for baseline testing
+  mssql-basic:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-basic-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - '1433:1433'
+    volumes:
+      - mssql-basic-data:/var/opt/mssql
+    shm_size: '2gb'
+    mem_limit: 4g
+    cpus: 2
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  # Password with curly braces and special characters
+  mssql-curly:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-curly-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Strong{Pass}2024!
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - '1434:1433'
+    volumes:
+      - mssql-curly-data:/var/opt/mssql
+    shm_size: '2gb'
+    mem_limit: 4g
+    cpus: 2
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Strong{Pass}2024!" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  # Password with URL problematic characters
+  mssql-url-chars:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-url-chars-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Pass@#%&2024
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - '1435:1433'
+    volumes:
+      - mssql-url-chars-data:/var/opt/mssql
+    shm_size: '2gb'
+    mem_limit: 4g
+    cpus: 2
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Pass@#%&2024" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  # Password with SQL escape characters
+  mssql-sql-chars:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-sql-chars-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Pass'Word"2024
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - '1436:1433'
+    volumes:
+      - mssql-sql-chars-data:/var/opt/mssql
+    shm_size: '2gb'
+    mem_limit: 4g
+    cpus: 2
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Pass'Word\"2024" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  # Complex password with multiple special characters including curly braces
+  mssql-complex:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-complex-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=P{a}s@s#w%o&r*d!2024
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - '1437:1433'
+    volumes:
+      - mssql-complex-data:/var/opt/mssql
+    shm_size: '2gb'
+    mem_limit: 4g
+    cpus: 2
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "P{a}s@s#w%o&r*d!2024" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  mssql-basic-data:
+  mssql-curly-data:
+  mssql-url-chars-data:
+  mssql-sql-chars-data:
+  mssql-complex-data:

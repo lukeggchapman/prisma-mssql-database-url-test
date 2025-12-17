@@ -1,0 +1,38 @@
+{
+  "name": "database-connection-tester",
+  "version": "1.0.0",
+  "description": "Test database connections with Prisma 7 MSSQL adapter and special character passwords",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node scripts/run-all-tests.ts",
+    "test:connection": "ts-node src/connection-tests.ts",
+    "test:migration": "ts-node src/migration-tests.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:reset": "prisma migrate reset --force",
+    "setup": "pnpm install && pnpm db:generate"
+  },
+  "keywords": [
+    "prisma",
+    "mssql",
+    "database",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "@prisma/adapter-mssql": "^7.1.0",
+    "@prisma/client": "^7.1.0",
+    "dotenv": "^16.4.5",
+    "prisma": "^7.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

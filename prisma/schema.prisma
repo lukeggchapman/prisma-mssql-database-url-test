@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model ConnectionTest {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  testValue   String   @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("connection_tests")
+}
+
+model SpecialCharTest {
+  id            Int      @id @default(autoincrement())
+  passwordType  String   @db.VarChar(50)
+  testResult    String   @db.VarChar(20)
+  errorMessage  String?  @db.Text
+  connectionUrl String?  @db.Text
+  createdAt     DateTime @default(now())
+
+  @@map("special_char_tests")
+}
