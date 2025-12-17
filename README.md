@@ -39,7 +39,7 @@ cp .env.example .env
 pnpm test
 
 # 4. View usage examples
-ts-node src/usage-examples.ts
+pnpm examples
 ```
 
 ## Prisma 7 Adapter Approaches
@@ -84,7 +84,7 @@ pnpm test:migration     # Test CLI operations with scenarios
 pnpm dev                # Interactive mode with instructions
 
 # Run examples  
-ts-node src/usage-examples.ts
+pnpm examples
 
 # Individual container testing
 docker-compose logs mssql-curly  # Check specific container

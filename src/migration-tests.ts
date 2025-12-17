@@ -218,6 +218,6 @@ export async function runMigrationTests(): Promise<void> {
   console.log('\n💾 Detailed results available in migration test output above.');
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runMigrationTests().catch(console.error);
 }

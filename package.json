@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/index.ts",
-    "test": "ts-node scripts/run-all-tests.ts",
-    "test:connection": "ts-node src/connection-tests.ts",
-    "test:migration": "ts-node src/migration-tests.ts",
-    "examples": "ts-node src/usage-examples.ts",
+    "dev": "tsx src/index.ts",
+    "test": "tsx scripts/run-all-tests.ts",
+    "test:connection": "tsx src/connection-tests.ts",
+    "test:migration": "tsx src/migration-tests.ts",
+    "examples": "tsx src/usage-examples.ts",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
   }
 }
