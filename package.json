@@ -13,6 +13,7 @@
     "examples": "tsx src/usage-examples.ts",
     "test:compare": "tsx src/cli-vs-adapter-test.ts",
     "test:url-vs-config": "tsx src/adapter-url-vs-config-test.ts",
+    "test:comprehensive": "tsx src/comprehensive-database-url-test.ts",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
