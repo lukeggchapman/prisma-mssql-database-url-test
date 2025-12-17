@@ -52,9 +52,14 @@ export const testScenarios: TestScenario[] = [
   },
   {
     name: "URL Problematic Characters",
-    password: "Pass@#%&2024",
+    password: "Pass@#%&(Test)2024",
     port: 1435,
-    databaseUrl: createDatabaseUrl("localhost", 1435, "sa", "Pass@#%&2024"),
+    databaseUrl: createDatabaseUrl(
+      "localhost",
+      1435,
+      "sa",
+      "Pass@#%&(Test)2024"
+    ),
   },
   {
     name: "SQL Escape Characters",

@@ -29,7 +29,7 @@ const services: DockerService[] = [
     name: "mssql-url-chars",
     container: "mssql-url-chars-test",
     port: 1435,
-    password: "Pass@#%&2024",
+    password: "Pass@#%&(Test)2024",
   },
   {
     name: "mssql-sql-chars",
