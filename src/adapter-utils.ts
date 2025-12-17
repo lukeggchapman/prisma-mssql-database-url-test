@@ -105,6 +105,11 @@ export function urlEncodePassword(password: string): string {
     .replace(/}/g, '%7D');
 }
 
+export function escapeSqlServerPassword(password: string): string {
+  // CLI-specific escaping: wrap problematic characters in curly braces
+  return password.replace(/[;=[\]{}]/g, (char: string) => `{${char}}`);
+}
+
 export function createDatabaseUrl(
   host: string,
   port: number,
@@ -114,4 +119,16 @@ export function createDatabaseUrl(
 ): string {
   const encodedPassword = urlEncodePassword(password);
   return `sqlserver://${username}:${encodedPassword}@${host}:${port}?database=${database}&encrypt=true&trustServerCertificate=true`;
+}
+
+export function createCliDatabaseUrl(
+  host: string,
+  port: number,
+  username: string,
+  password: string,
+  database: string = 'master',
+  engine: string = 'sqlserver'
+): string {
+  const escapedPassword = escapeSqlServerPassword(password);
+  return `${engine}://${host}:${String(port)};initial catalog=${database};user=${username};password=${escapedPassword};encrypt=true;trustServerCertificate=true;`;
 }

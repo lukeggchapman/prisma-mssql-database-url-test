@@ -1,12 +1,30 @@
 import { defineConfig, env } from "prisma/config";
 
-// Test scenario URLs for different password patterns
+// Password escaping function for CLI (same as in adapter-utils.ts)
+function escapeSqlServerPassword(password: string): string {
+  // CLI-specific escaping: wrap problematic characters in curly braces
+  return password.replace(/[;=[\]{}]/g, (char: string) => `{${char}}`);
+}
+
+function createCliDatabaseUrl(
+  host: string,
+  port: number,
+  username: string,
+  password: string,
+  database: string = 'master',
+  engine: string = 'sqlserver'
+): string {
+  const escapedPassword = escapeSqlServerPassword(password);
+  return `${engine}://${host}:${String(port)};initial catalog=${database};user=${username};password=${escapedPassword};encrypt=true;trustServerCertificate=true;`;
+}
+
+// Test scenario URLs using CLI-specific escaping
 const testScenarios = {
-  basic: "sqlserver://localhost:1433;database=master;user=sa;password=YourStrong@Passw0rd;encrypt=true;trustServerCertificate=true",
-  curly: "sqlserver://localhost:1434;database=master;user=sa;password=Strong{Pass}2024!;encrypt=true;trustServerCertificate=true", 
-  urlChars: "sqlserver://localhost:1435;database=master;user=sa;password=Pass@#%&2024;encrypt=true;trustServerCertificate=true",
-  sqlChars: "sqlserver://localhost:1436;database=master;user=sa;password=Pass'Word\"2024;encrypt=true;trustServerCertificate=true",
-  complex: "sqlserver://localhost:1437;database=master;user=sa;password=P{a}s@s#w%o&r*d!2024;encrypt=true;trustServerCertificate=true"
+  basic: createCliDatabaseUrl("localhost", 1433, "sa", "YourStrong@Passw0rd"),
+  curly: createCliDatabaseUrl("localhost", 1434, "sa", "Strong{Pass}2024!"), 
+  urlChars: createCliDatabaseUrl("localhost", 1435, "sa", "Pass@#%&2024"),
+  sqlChars: createCliDatabaseUrl("localhost", 1436, "sa", "Pass'Word\"2024"),
+  complex: createCliDatabaseUrl("localhost", 1437, "sa", "P{a}s@s#w%o&r*d!2024")
 };
 
 // Function to get the appropriate database URL

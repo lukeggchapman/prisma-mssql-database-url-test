@@ -11,6 +11,7 @@
     "test:connection": "tsx src/connection-tests.ts",
     "test:migration": "tsx src/migration-tests.ts",
     "examples": "tsx src/usage-examples.ts",
+    "test:compare": "tsx src/cli-vs-adapter-test.ts",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
