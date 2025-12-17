@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import * as dotenv from "dotenv";
-import { 
-  createMssqlAdapterFromUrl, 
-  createMssqlAdapterFromConfig, 
+import {
+  createMssqlAdapterFromUrl,
+  createMssqlAdapterFromConfig,
   createMssqlConfig,
   createDatabaseUrl,
-  urlEncodePassword 
-} from './adapter-utils.js';
+  urlEncodePassword,
+} from "./adapter-utils.js";
 
 dotenv.config();
 
@@ -26,7 +26,6 @@ interface TestScenario {
     trustServerCertificate: boolean;
   };
 }
-
 
 export const testScenarios: TestScenario[] = [
   {
@@ -127,20 +126,26 @@ export async function testDatabaseConnection(scenario: TestScenario): Promise<{
 
     // Test 2: Individual config approach
     console.log(`\n🔧 Testing individual config approach`);
-    
+
     try {
       const config = createMssqlConfig(
-        'localhost',
+        "localhost",
         scenario.port,
-        'sa',
+        "sa",
         scenario.password
       );
-      
-      console.log(`   Config: ${JSON.stringify({
-        ...config,
-        password: '[REDACTED]'
-      }, null, 2)}`);
-      
+
+      console.log(
+        `   Config: ${JSON.stringify(
+          {
+            ...config,
+            password: "[REDACTED]",
+          },
+          null,
+          2
+        )}`
+      );
+
       const adapter = await createMssqlAdapterFromConfig(config);
       const prisma = new PrismaClient({
         adapter,
@@ -175,10 +180,14 @@ export async function testDatabaseConnection(scenario: TestScenario): Promise<{
           configError instanceof Error ? configError.message : "Unknown error"
         }`
       );
-      
+
       return {
         success: false,
-        error: `DATABASE_URL: ${error instanceof Error ? error.message : "Unknown error"}; Config: ${configError instanceof Error ? configError.message : "Unknown error"}`,
+        error: `DATABASE_URL: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }; Config: ${
+          configError instanceof Error ? configError.message : "Unknown error"
+        }`,
         method: "database_url",
       };
     }

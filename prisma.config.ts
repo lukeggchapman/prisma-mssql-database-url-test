@@ -2,11 +2,11 @@ import { defineConfig, env } from "prisma/config";
 
 // Test scenario URLs for different password patterns
 const testScenarios = {
-  basic: "sqlserver://sa:YourStrong%40Passw0rd@localhost:1433?database=master&encrypt=true&trustServerCertificate=true",
-  curly: "sqlserver://sa:Strong%7BPass%7D2024!@localhost:1434?database=master&encrypt=true&trustServerCertificate=true", 
-  urlChars: "sqlserver://sa:Pass%40%23%25%262024@localhost:1435?database=master&encrypt=true&trustServerCertificate=true",
-  sqlChars: "sqlserver://sa:Pass%27Word%222024@localhost:1436?database=master&encrypt=true&trustServerCertificate=true",
-  complex: "sqlserver://sa:P%7Ba%7Ds%40s%23w%25o%26r*d!2024@localhost:1437?database=master&encrypt=true&trustServerCertificate=true"
+  basic: "sqlserver://localhost:1433;database=master;user=sa;password=YourStrong@Passw0rd;encrypt=true;trustServerCertificate=true",
+  curly: "sqlserver://localhost:1434;database=master;user=sa;password=Strong{Pass}2024!;encrypt=true;trustServerCertificate=true", 
+  urlChars: "sqlserver://localhost:1435;database=master;user=sa;password=Pass@#%&2024;encrypt=true;trustServerCertificate=true",
+  sqlChars: "sqlserver://localhost:1436;database=master;user=sa;password=Pass'Word\"2024;encrypt=true;trustServerCertificate=true",
+  complex: "sqlserver://localhost:1437;database=master;user=sa;password=P{a}s@s#w%o&r*d!2024;encrypt=true;trustServerCertificate=true"
 };
 
 // Function to get the appropriate database URL

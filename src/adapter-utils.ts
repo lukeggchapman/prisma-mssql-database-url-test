@@ -17,20 +17,55 @@ export interface DatabaseUrlConfig {
 }
 
 export function createMssqlConfigFromUrl(databaseUrl: string): MssqlConfig {
-  const url = new URL(databaseUrl);
-  const params = new URLSearchParams(url.search);
-  
-  return {
-    server: url.hostname,
-    port: parseInt(url.port) || 1433,
-    user: url.username,
-    password: decodeURIComponent(url.password),
-    database: params.get('database') || 'master',
-    options: {
-      encrypt: params.get('encrypt') === 'true',
-      trustServerCertificate: params.get('trustServerCertificate') === 'true',
-    },
-  };
+  if (databaseUrl.includes(';')) {
+    // Handle SQL Server semicolon format: sqlserver://localhost:1433;database=master;user=sa;password=pass;encrypt=true
+    const [hostPart, ...paramParts] = databaseUrl.split(';');
+    const hostMatch = hostPart.match(/sqlserver:\/\/([^:]+):?(\d+)?/);
+    
+    if (!hostMatch) {
+      throw new Error('Invalid SQL Server connection string format');
+    }
+    
+    const host = hostMatch[1];
+    const port = parseInt(hostMatch[2]) || 1433;
+    
+    // Parse semicolon-separated parameters
+    const params: Record<string, string> = {};
+    paramParts.forEach(param => {
+      const [key, value] = param.split('=');
+      if (key && value) {
+        params[key.toLowerCase()] = value;
+      }
+    });
+    
+    return {
+      server: host,
+      port,
+      user: params.user || 'sa',
+      password: params.password || '',
+      database: params.database || 'master',
+      options: {
+        encrypt: params.encrypt === 'true',
+        trustServerCertificate: params.trustservercertificate === 'true',
+      },
+    };
+  } else {
+    // Handle standard URL format: sqlserver://user:pass@host:port?database=master&encrypt=true
+    const url = new URL(databaseUrl);
+    const params = new URLSearchParams(url.search);
+    
+    return {
+      server: url.hostname,
+      port: parseInt(url.port) || 1433,
+      user: url.username,
+      password: decodeURIComponent(url.password),
+      database: params.get('database') || 'master',
+      options: {
+        encrypt: params.get('encrypt') === 'true',
+        trustServerCertificate: params.get('trustServerCertificate') === 'true',
+      },
+    };
+  }
 }
 
 export function createMssqlConfig(
