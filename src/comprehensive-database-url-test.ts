@@ -60,47 +60,14 @@ interface TestResult {
   error?: string;
 }
 
-// Simple URL parser for SQL Server URLs
-function createMssqlConfigFromUrl(url: string): any {
-  const [hostPart, ...paramParts] = url.split(';');
-  const hostMatch = hostPart.match(/sqlserver:\/\/([^:]+):?(\d+)?/);
-  
-  if (!hostMatch) {
-    throw new Error('Invalid SQL Server URL format');
-  }
-  
-  const host = hostMatch[1];
-  const port = parseInt(hostMatch[2]) || 1433;
-  
-  const params: Record<string, string> = {};
-  paramParts.forEach(param => {
-    const [key, value] = param.split('=');
-    if (key && value) {
-      params[key.toLowerCase().trim()] = value.trim();
-    }
-  });
-  
-  return {
-    server: host,
-    port,
-    user: params.user || 'sa',
-    password: params.password || '',
-    database: params['initial catalog'] || params.database || 'master',
-    options: {
-      encrypt: params.encrypt === 'true',
-      trustServerCertificate: params.trustservercertificate === 'true',
-    },
-  };
-}
 
 async function testAdapterWithUrl(databaseUrl: string, description: string): Promise<TestResult> {
   console.log(`\n🔌 Testing Adapter with ${description}`);
   console.log(`   URL: ${databaseUrl.replace(/password=[^;]+/, 'password=[HIDDEN]')}`);
   
   try {
-    // Parse URL to config (since PrismaMssql doesn't accept strings directly)
-    const config = createMssqlConfigFromUrl(databaseUrl);
-    const adapter = new PrismaMssql(config);
+    // Pass URL string directly to PrismaMssql
+    const adapter = new PrismaMssql(databaseUrl);
     
     const prisma = new PrismaClient({
       adapter,
