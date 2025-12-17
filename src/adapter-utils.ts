@@ -78,5 +78,5 @@ export function createDatabaseUrl(
   database: string = 'master'
 ): string {
   const encodedPassword = urlEncodePassword(password);
-  return `sqlserver://${username}:${encodedPassword}@${host}:${port};database=${database};encrypt=true;trustServerCertificate=true`;
+  return `sqlserver://${username}:${encodedPassword}@${host}:${port}?database=${database}&encrypt=true&trustServerCertificate=true`;
 }
